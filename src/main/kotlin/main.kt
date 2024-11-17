@@ -6,16 +6,16 @@ fun main() {
 
 
     // 2 задача
-    val result = calculateCommission("MasterCard", 70_000, 10_000)
+    val result = calculateCommission("MasterCard", 70_000.0, 10_000.0)
     println(result.first) // 60.0 (10 000 * 0.006)
     println(result.second) // true
 
-    val visaResult = calculateCommission(cardType = "Visa", transferAmount = 5000)
+    val visaResult = calculateCommission(cardType = "Visa", transferAmount = 5000.0)
     println(visaResult.first) // 37.5 (5000 * 0.0075), округляем до 38
     println(visaResult.second) // true
 
 // Превышение суточного лимита
-    val blockedResult = calculateCommission(transferAmount = 200_000)
+    val blockedResult = calculateCommission(transferAmount = 200_000.0)
     println(blockedResult.first) // 0.0
     println(blockedResult.second) // false
 }
@@ -53,7 +53,7 @@ fun calculateCommission(
     cardType: String = "Мир",
     previousTransfersInMonth: Double = 0.0,
     transferAmount: Double
-): Pair<Double, Boolean> {
+): Pair<Any, Boolean> {
 
     if (transferAmount > 150_000) {
         return Pair(0.0, false)
@@ -70,11 +70,17 @@ fun calculateCommission(
         "MasterCard" -> {
             val limitWithoutCommission = 75_000
 
-            if (previousTransfersInMonth >= limitWithoutCommission) {
-                val amountAfterLimit = totalTransferInMonth - limitWithoutCommission
-                commission = amountAfterLimit * 0.006 + 20
+            val amountAfterLimit: Double = when {
+                previousTransfersInMonth >= limitWithoutCommission -> transferAmount
+                previousTransfersInMonth < limitWithoutCommission && totalTransferInMonth > limitWithoutCommission ->
+                    totalTransferInMonth - limitWithoutCommission
+
+                else -> 0.0
             }
+
+            commission = amountAfterLimit * 0.006 + 20
         }
+
 
         "Visa" -> {
             commission = transferAmount * 0.0075
