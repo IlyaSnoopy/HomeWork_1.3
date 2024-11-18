@@ -74,11 +74,13 @@ fun calculateCommission(
                 previousTransfersInMonth >= limitWithoutCommission -> transferAmount
                 previousTransfersInMonth < limitWithoutCommission && totalTransferInMonth > limitWithoutCommission ->
                     totalTransferInMonth - limitWithoutCommission
-
                 else -> 0.0
             }
 
-            commission = amountAfterLimit * 0.006 + 20
+            if (amountAfterLimit == 0.0) {
+               commission = 0.0
+            }
+            else commission = amountAfterLimit * 0.006 + 20
         }
 
 
